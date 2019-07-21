@@ -1,0 +1,4 @@
+*.pyc
+.envrc
+molecule.yml
+*.retry
