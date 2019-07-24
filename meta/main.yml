@@ -1,8 +1,9 @@
 ---
 galaxy_info:
-  author: your name
+  role_name: k8s-metallb
+  author: Matias Emanuel Ferrigno
   description: your description
-  company: your company (optional)
+  company: Mikroways
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
