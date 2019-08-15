@@ -3,7 +3,7 @@
 
 - name: Create metallb namespace
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: v1
       kind: Namespace
@@ -11,13 +11,10 @@
         name: metallb-system
         labels:
           app: metallb
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
 
 - name: create service account for controller
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: v1
       kind: ServiceAccount
@@ -26,13 +23,10 @@
         name: controller
         labels:
           app: metallb
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
 
 - name: create service account for speaker
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: v1
       kind: ServiceAccount
@@ -41,13 +35,10 @@
         name: speaker
         labels:
           app: metallb
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
 
 - name: create cluster role for controller
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRole
@@ -65,13 +56,10 @@
       - apiGroups: [""]
         resources: ["events"]
         verbs: ["create", "patch"]
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
 
 - name: create cluster role for spaeker
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRole
@@ -83,13 +71,10 @@
       - apiGroups: [""]
         resources: ["services", "endpoints", "nodes"]
         verbs: ["get", "list", "watch"]
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
 
 - name: create role config-watcher
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: Role
@@ -105,13 +90,10 @@
       - apiGroups: [""]
         resources: ["events"]
         verbs: ["create"]
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
 
 - name: create cluster role binding for controller
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
@@ -127,13 +109,10 @@
         apiGroup: rbac.authorization.k8s.io
         kind: ClusterRole
         name: metallb-system:controller
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
 
 - name: create role cluster binding for speaker
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
@@ -149,13 +128,10 @@
         apiGroup: rbac.authorization.k8s.io
         kind: ClusterRole
         name: metallb-system:speaker
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
 
 - name: create role binding for config-watcher
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: RoleBinding
@@ -173,9 +149,6 @@
         apiGroup: rbac.authorization.k8s.io
         kind: Role
         name: config-watcher
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
 
 - name: create configmap metallb
   k8s:
@@ -188,16 +161,13 @@
         config: |
           address-pools:
           - name: loadbalanced
-            protocol: "{{ metallb.protocol }}"
+            protocol: "{{ metallb_protocol }}"
             addresses:
-            - "{{ metallb.ip_range }}"
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
+            - "{{ metallb_ip_range }}"
 
 - name: create daemonset for speaker
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: apps/v1beta2
       kind: DaemonSet
@@ -226,7 +196,7 @@
             hostNetwork: true
             containers:
             - name: speaker
-              image: "metallb/speaker:{{ metallb.version }}"
+              image: "metallb/speaker:{{ metallb_version }}"
               imagePullPolicy: IfNotPresent
               args:
               - --port=7472
@@ -241,8 +211,8 @@
                 containerPort: 7472
               resources:
                 limits:
-                  cpu: "{{ metallb.limits.cpu }}"
-                  memory: "{{ metallb.limits.memory }}"
+                  cpu: "{{ metallb_limits_cpu }}"
+                  memory: "{{ metallb_limits_memory }}"
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
@@ -251,13 +221,10 @@
                   - all
                   add:
                   - net_raw
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
     
 - name: create deployment for controller
   k8s:
-    state: present
+    state: "{{ 'present' if metallb_enabled else 'absent' }}"
     definition:
       apiVersion: apps/v1beta2
       kind: Deployment
@@ -289,7 +256,7 @@
               runAsUser: 65534 # nobody
             containers:
             - name: controller
-              image: "metallb/controller:{{ metallb.version }}"
+              image: "metallb/controller:{{ metallb_version }}"
               imagePullPolicy: IfNotPresent
               args:
               - --port=7472
@@ -299,14 +266,11 @@
                 containerPort: 7472
               resources:
                 limits:
-                  cpu: "{{ metallb.limits.cpu }}"
-                  memory: "{{ metallb.limits.memory }}"
+                  cpu: "{{ metallb_limits_cpu }}"
+                  memory: "{{ metallb_limits_memory }}"
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop:
                   - all
                 readOnlyRootFilesystem: true
-  environment: "{{ k8s.env }}"
-  become: yes
-  run_once: yes
