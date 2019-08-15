@@ -1,7 +1,7 @@
 ---
  
 metallb_enabled: true
-metallb_version: v0.7.3
+metallb_version: v0.8.1
 metallb_ip_range: "10.5.0.50-10.5.0.99"
 metallb_ip_protocol: "layer2"
 metallb_limits_cpu: "100m"
