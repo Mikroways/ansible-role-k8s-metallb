@@ -202,6 +202,11 @@
             addresses:
             - "{{ metallb_ip_range }}"
 
+- set_fact:
+    selector: "{{ ( selector | default({})) | combine({ item }) "
+  when: metallb_label_selector_enabled
+  loop: metallb_label_selector
+
 - name: create daemonset for speaker
   k8s:
     state: "{{ 'present' if metallb_enabled else 'absent' }}"
@@ -233,11 +238,7 @@
             hostNetwork: true
             nodeSelector:
               beta.kubernetes.io/os: linux
-{% if metallb_label_selector_enabled %}
-{% for selector in metallb_label_selector %}
               {{ selector }}
-{% endfor %}
-{% endif %}
             tolerations:
             - effect: NoSchedule
               key: node-role.kubernetes.io/master
@@ -306,11 +307,7 @@
             terminationGracePeriodSeconds: 0
             nodeSelector:
               beta.kubernetes.io/os: linux
-              {% if metallb_label_selector_enabled %}
-              {% for selector in metallb_label_selector %}
               {{ selector }}
-              {% endfor %}
-              {% endif %}
             securityContext:
               runAsNonRoot: true
               runAsUser: 65534
