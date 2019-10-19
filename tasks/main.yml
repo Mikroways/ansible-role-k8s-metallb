@@ -203,7 +203,7 @@
             - "{{ metallb_ip_range }}"
 
 - set_fact:
-    selector: "{{ ( selector | default({})) | combine({ item }) "
+    selector: "{{ ( selector | default({ 'beta.kubernetes.io/os': 'linux' })) | combine({ item }) "
   when: metallb_label_selector_enabled
   loop: metallb_label_selector
 
@@ -237,7 +237,6 @@
             terminationGracePeriodSeconds: 0
             hostNetwork: true
             nodeSelector:
-              beta.kubernetes.io/os: linux
               {{ selector }}
             tolerations:
             - effect: NoSchedule
@@ -306,7 +305,6 @@
             serviceAccountName: controller
             terminationGracePeriodSeconds: 0
             nodeSelector:
-              beta.kubernetes.io/os: linux
               {{ selector }}
             securityContext:
               runAsNonRoot: true
