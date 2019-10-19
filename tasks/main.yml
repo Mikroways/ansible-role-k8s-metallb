@@ -203,7 +203,7 @@
             - "{{ metallb_ip_range }}"
 
 - set_fact:
-    selector: "{{ ( selector | default({ 'beta.kubernetes.io/os': 'linux' })) | combine({ item }) "
+    selector: "{{ ( selector | default({})) | combine({ item }) "
   when: metallb_label_selector_enabled
   loop: "{{ metallb_label_selector }}"
 
