@@ -236,7 +236,7 @@
             serviceAccountName: speaker
             terminationGracePeriodSeconds: 0
             hostNetwork: true
-            nodeSelector: {{ selector }}
+            nodeSelector: "{{ selector }}"
             tolerations:
             - effect: NoSchedule
               key: node-role.kubernetes.io/master
@@ -303,7 +303,7 @@
           spec:
             serviceAccountName: controller
             terminationGracePeriodSeconds: 0
-            nodeSelector: {{ selector }}
+            nodeSelector: "{{ selector }}"
             securityContext:
               runAsNonRoot: true
               runAsUser: 65534
