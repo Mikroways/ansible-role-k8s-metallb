@@ -205,7 +205,7 @@
 - set_fact:
     selector: "{{ ( selector | default({ 'beta.kubernetes.io/os': 'linux' })) | combine({ item }) "
   when: metallb_label_selector_enabled
-  loop: metallb_label_selector
+  loop: "{{ metallb_label_selector }}"
 
 - name: create daemonset for speaker
   k8s:
