@@ -233,11 +233,11 @@
             hostNetwork: true
             nodeSelector:
               beta.kubernetes.io/os: linux
-              {% if metallb_label_selector_enabled %}
-              {% for selector in metallb_label_selector %}
+{% if metallb_label_selector_enabled %}
+{% for selector in metallb_label_selector %}
               {{ selector }}
-              {% endfor %}
-              {% endif %}
+{% endfor %}
+{% endif %}
             tolerations:
             - effect: NoSchedule
               key: node-role.kubernetes.io/master
