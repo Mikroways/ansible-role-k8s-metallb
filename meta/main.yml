@@ -24,4 +24,4 @@ galaxy_info:
     - "metallb"
 
 dependencies:
-- matiferrigno.k8s_base
+- mikroways.k8s_base
