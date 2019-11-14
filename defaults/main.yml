@@ -1,10 +1,10 @@
 ---
  
-metallb_enabled: true
-metallb_version: v0.8.1
-metallb_ip_range: "10.5.0.50-10.5.0.99"
-metallb_protocol: "layer2"
-metallb_limits_cpu: "100m"
-metallb_limits_memory:  "100Mi"
-metallb_label_selector_enabled: false
-metallb_label_selector: []
+m7s_metallb_enabled: false
+m7s_metallb_version: v0.8.1
+m7s_metallb_ip_range: "10.5.0.50-10.5.0.99"
+m7s_metallb_protocol: "layer2"
+m7s_metallb_limits_cpu: "100m"
+m7s_metallb_limits_memory:  "100Mi"
+m7s_metallb_label_selector_enabled: false
+m7s_metallb_label_selector: []

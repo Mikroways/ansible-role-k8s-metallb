@@ -1,7 +1,7 @@
 ---
 
 galaxy_info:
-  role_name: k8s_metallb
+  role_name: m7s_metallb
   author: 'Matias Ferrigno'
   description: 'Install metallb on k8s'
   company: 'Mikroways'
@@ -24,4 +24,4 @@ galaxy_info:
     - "metallb"
 
 dependencies:
-- mikroways.k8s_base
+- mikroways.m7s_base

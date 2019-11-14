@@ -3,7 +3,7 @@
 
 - name: Create metallb namespace
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: v1
       kind: Namespace
@@ -14,7 +14,7 @@
 
 - name: create pod security policy
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: policy/v1beta1
       kind: PodSecurityPolicy
@@ -47,7 +47,7 @@
 
 - name: create service account for controller
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: v1
       kind: ServiceAccount
@@ -59,7 +59,7 @@
 
 - name: create service account for speaker
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: v1
       kind: ServiceAccount
@@ -71,7 +71,7 @@
 
 - name: create cluster role for controller
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRole
@@ -92,7 +92,7 @@
 
 - name: create cluster role for spaeker
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRole
@@ -114,7 +114,7 @@
 
 - name: create role config-watcher
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: Role
@@ -130,7 +130,7 @@
 
 - name: create cluster role binding for controller
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
@@ -149,7 +149,7 @@
 
 - name: create role cluster binding for speaker
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
@@ -168,7 +168,7 @@
 
 - name: create role binding for config-watcher
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: RoleBinding
@@ -189,6 +189,7 @@
 
 - name: create configmap metallb
   k8s:
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       kind: ConfigMap
       metadata:
@@ -198,18 +199,19 @@
         config: |
           address-pools:
           - name: loadbalanced
-            protocol: "{{ metallb_protocol }}"
+            protocol: "{{ m7s_metallb_protocol }}"
             addresses:
-            - "{{ metallb_ip_range }}"
+            - "{{ m7s_metallb_ip_range }}"
 
 - set_fact:
     selector: "{{ ( selector | default({})) | combine({ item.key: item.value }) }}"
-  when: metallb_label_selector_enabled
-  loop: "{{ metallb_label_selector }}"
+  when: m7s_metallb_label_selector_enabled
+  loop: "{{ m7s_metallb_label_selector }}"
 
 - name: create daemonset for speaker
+  when: m7s_metallb_label_selector_enabled
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: apps/v1beta2
       kind: DaemonSet
@@ -261,8 +263,8 @@
                 containerPort: 7472
               resources:
                 limits:
-                  cpu: "{{ metallb_limits_cpu }}"
-                  memory: "{{ metallb_limits_memory }}"
+                  cpu: "{{ m7s_metallb_limits_cpu }}"
+                  memory: "{{ m7s_metallb_limits_memory }}"
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
@@ -275,8 +277,9 @@
                 readOnlyRootFilesystem: true
     
 - name: create deployment for controller
+  when: m7s_metallb_label_selector_enabled
   k8s:
-    state: "{{ 'present' if metallb_enabled else 'absent' }}"
+    state: "{{ 'present' if m7s_metallb_enabled else 'absent' }}"
     definition:
       apiVersion: apps/v1beta2
       kind: Deployment
@@ -319,8 +322,8 @@
                 containerPort: 7472
               resources:
                 limits:
-                  cpu: "{{ metallb_limits_cpu }}"
-                  memory: "{{ metallb_limits_memory }}"
+                  cpu: "{{ m7s_metallb_limits_cpu }}"
+                  memory: "{{ m7s_metallb_limits_memory }}"
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
