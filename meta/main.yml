@@ -1,7 +1,6 @@
 ---
-
 galaxy_info:
-  role_name: m7s_metallb
+  role_name: m7s_k8s_metallb
   author: 'Matias Ferrigno'
   description: 'Install metallb on k8s'
   company: 'Mikroways'
@@ -9,14 +8,11 @@ galaxy_info:
   min_ansible_version: '2.0.0'
 
   platforms:
-
     - name: 'Ubuntu'
       versions: [ 'all' ]
-
     - name: 'Debian'
       versions: [ 'all' ]
-    
-    - name: 'RedHat'
+    - name: 'EL'
       versions: [ '7' ]
 
   galaxy_tags:
@@ -24,4 +20,4 @@ galaxy_info:
     - "metallb"
 
 dependencies:
-- mikroways.m7s_base
+- mikroways.m7s_k8s_base
